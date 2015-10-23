@@ -1,5 +1,5 @@
 #What is drydock?
-drydock is a Docker security audit and hardening tool written in Python. It was initially inspired by [docker-bench-security](https://github.com/docker/docker-bench-security) but aims to provide a more flexible way for assesing Docker installations and deployments. drydock allows easy creation and use of **custom audit profiles** in order to eliminate noise and false alarms. Reports are saved in JSON format for easier parsing. 
+**drydock** is a Docker security audit tool written in Python. It was initially inspired by [docker-bench-security](https://github.com/docker/docker-bench-security) but aims to provide a more flexible way for assesing Docker installations and deployments. drydock allows easy creation and use of **custom audit profiles** in order to eliminate noise and false alarms. Reports are saved in JSON format for easier parsing. 
 
 At the moment all of the security checks performed are based on the [CIS Docker 1.6 Benchmark](https://benchmarks.cisecurity.org/tools2/docker/CIS_Docker_1.6_Benchmark_v1.0.0.pdf). 
 
@@ -34,4 +34,4 @@ A profile containing all checks is provided in conf/default.yaml and can be used
 
 ## Contributions
 
-drydock is in beta stage and needs testing under different environments. All contributions ( bugs/improvements/suggestions etc. ) are welcome!
+drydock is in alpha stage and needs testing under different environments (currently tested only on Ubuntu/Debian deployments). All contributions ( bugs/improvements/suggestions etc. ) are welcome!
