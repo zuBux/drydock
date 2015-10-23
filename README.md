@@ -18,10 +18,12 @@ The following options are available:
 
 * -o <file_name> : Specifies the path where JSON output will be saved. Switches to output.json if none specified.
 
-* -p <profile> : The profile which will be used for the audit. Switches to default if none specified.
+* -p <profile> : The profile which will be used for the audit. Switches to conf/default.yaml if none specified.
 
 
-A profile containing all checks is provided in conf/default.yaml and can be used as reference for creating custom profiles. 
+A profile containing all checks is provided in conf/default.yaml and can be used as reference for creating custom profiles.
+
+**Users are advised to run drydock as root** for more accurate results.
 
 
 ## TODO
