@@ -1,0 +1,100 @@
+host:
+  - check_seperate_partition        #1.1 Create a seperate partition for containers
+  - check_kernel_ver:               #1.2 Use the updated kernel version
+      version :  "3.13"
+  - check_listening_srv             #1.5 Remove all non-essential services from the host
+  - check_docker_ver:               #1.6 Keep Docker up to date
+      version : "1.8.2"
+  - list_trusted_users              #1.7 Only allow trusted users to control Docker daemon
+  - check_auditd_rules:             #1.8 - 1.19 Audit docker daemon, files and directories
+      paths: ["/usr/bin/docker",
+              "/var/lib/docker",
+              "/etc/docker",
+              "/usr/lib/systemd/system/docker-registry.service",
+              "/usr/lib/systemd/system/docker.service",
+              "/var/run/docker.sock",
+              "/etc/sysconfig/docker",
+              "/etc/sysconfig/docker-network",
+              "/etc/sysconfig/docker-registry",
+              "/etc/sysconfig/docker-storage",
+              "/etc/default/docker"
+              ]
+
+
+dockerconf:
+  - check_unwanted_args:
+      args: ["--exec-driver=lxc",
+             "--iptables=false",
+             "--log-level",
+             "--insecure-registry",
+             "-H"
+            ]
+  - check_wanted_args:
+      args: ["--icc=false",
+             "--registry-mirror",
+             "--default-ulimit"
+            ]
+dockerfiles:
+  - check_owner:
+      user: "root"
+      paths: ["/usr/lib/systemd/system/docker.service",
+              "/usr/lib/systemd/system/docker-registry.service",
+              "/usr/lib/systemd/system/docker.socket",
+              "/etc/sysconfig/docker",
+              "/etc/default/docker",
+              "/var/run/docker.sock",
+              "/etc/sysconfig/docker-network",
+              "/etc/sysconfig/docker-registry",
+              "/etc/sysconfig/docker-storage",
+              "/etc/docker",
+              #"/etc/docker/certs.d/" directory
+              #<path to TLS CA certificate>
+              #<path to Docker server certificate file>
+              #<path to Docker server certificate key file>
+              "/var/run/docker.sock",
+              ]
+  - check_permissions:
+      paths: 
+        /usr/lib/systemd/system/docker.service: "644"
+        /usr/lib/systemd/system/docker-registry.service: "644"
+        /usr/lib/systemd/system/docker.socket: "644"
+        /etc/sysconfig/docker: "644"
+        /etc/default/docker: "644"
+        /etc/sysconfig/docker-network: "644"
+        /etc/sysconfig/docker-registry: "644"
+        /etc/sysconfig/docker-storage: "644"
+        /etc/docker: "755"
+        #/etc/docker/certs.d/: "444" directory
+        #<path to TLS CA certificate>: "444"
+        #<path to Docker server certificate file>: "444"
+        #<path to Docker server certificate key file>: "400"
+        /var/run/docker.sock: "660"
+
+container_imgs:
+  - container_user            #4.1 Create a user for the container
+
+container_runtime:
+  - verify_apparmor           #5.1 Verify AppArmor Profile, if applicable 
+  - verify_selinux            #5.2 Verify SELinux security options, if applicable 
+  - single_process            #5.3 Verify that containers are running only a single main process
+  - kernel_capabilities       #5.4 Restrict Linux Kernel Capabilities within containers
+  - privileged_containers     #5.5 Do not use privileged containers
+  - mounted_hostdirs          #5.6 Do not mount sensitive host system directories on containers
+  - ssh_running               #5.7 Do not run ssh within containers
+  - privileged_ports:         #5.8 Do not map privileged ports within containers
+      ignore:
+        bottle_img: 80
+  - open_ports:               #5.9 Open only needed ports on container
+      ignore:
+        bottle_img: 8080
+  - host_network_mode         #5.10 Do not use host network mode on container 
+  - memory_usage_limit        #5.11 Limit memory usage for container
+  - cpu_priority              #5.12 Set container CPU priority appropriately
+  - readonly_root_fs          #5.13 Mount container's root filesystem as read-only
+  - bind_host_interface       #5.14 Bind incoming container traffic to a specific host interface
+  - failure_restart_policy    #5.15 Set the 'on-failure' container restart policy to 5
+  - host_process_namespace    #5.16 Do not share the host's process namespace
+  - host_ipc_namespace        #5.17 Do not share the host's IPC namespace
+  - expose_host_devices       #5.18 Do not directly expose host devices to containers
+
+
