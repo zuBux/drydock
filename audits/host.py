@@ -13,7 +13,7 @@ from docker import Client
 class HostConfAudit(Audit):
 
   #Default values
-  kern_ver = 3.10 #kernel version
+  kern_ver = '3.10' #kernel version
 
   @assign_order(1)
   def check_seperate_partition(self):
