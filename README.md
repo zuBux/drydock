@@ -21,7 +21,7 @@ The following options are available:
 * -p <profile> : The profile which will be used for the audit. Switches to conf/default.yaml if none specified.
 
 
-A profile containing all checks is provided in conf/default.yaml and can be used as reference for creating custom profiles.
+A profile containing all checks is provided in conf/default.yaml and can be used as reference for creating custom profiles. You can disable an audit by commenting it out (and its options, if any).
 
 **Users are advised to run drydock as root** for more accurate results.
 

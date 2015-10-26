@@ -32,10 +32,10 @@ class Audit:
     for argument in audit.values():
       for key,value in argument.iteritems():
         args.append(value)
-   # try:
-    return getattr(self,func)(*args)
-   # except :
-   #   return logging.error("No audit named %s" %(func))
+    try:
+      return getattr(self,func)(*args)
+    except :
+      return logging.error("No audit named %s" %(func))
 
   def run_audits(self,audits):
     for audit in audits:
