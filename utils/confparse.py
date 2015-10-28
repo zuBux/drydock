@@ -1,5 +1,6 @@
 import yaml
 import sys
+import logging
 
 class ConfParse:
 

@@ -57,8 +57,6 @@ class ContainerRuntimeAudit(Audit):
     else:
       self.templog['status'] = 'Pass'
       self.templog['descr'] = "All containers have AppArmor profiles"
-    print self.templog
-
     return self.add_check_results('verify_apparmor')
     
   @assign_order(2)
@@ -218,29 +216,34 @@ class ContainerRuntimeAudit(Audit):
     return self.add_check_results('ssh_running')
 
   @assign_order(8)
-  def privileged_ports(self,args):
+  def privileged_ports(self,ignore_ports=None):
     """5.8 Do not map privileged ports within containers"""
     exclude = defaultdict(list)
-    mappings = defaultdict(list)
-    for k,v in args.iteritems():
-      exclude[k].append(v)
+    bad_mappings = defaultdict(list)
+    
+    if ignore_ports != None:
+      for k,v in ignore_ports.iteritems():
+        exclude[k].append(v)
     try:
       for cont in self.running:
         info = self.cli.inspect_container(cont)
-        contimg = info['Image']
-        ports = info['Ports']
-        for port in ports:
-          try:
-            pubport = port['PublicPort']
-            if pubport < 1024:
-              mappings[contimg].append(pubport)
-          except KeyError:
-            continue
+        ports = info['NetworkSettings']['Ports']
+        for mappings in ports.values():
+          for mapping in mappings:
+            try:
+              pubport = int(mapping['HostPort'])
+              if pubport < 1024:
+                bad_mappings[cont].append(pubport)
+            except KeyError:
+              continue
     except TypeError:
+      logging.error("No running containers")
       return None
-
-    privports = self.compare_dicts(mappings,exclude)
-
+    if exclude:
+      privports = self.compare_dicts(bad_mappings,exclude)
+    else:
+      privports = bad_mappings
+      
     if privports:
       self.templog['status'] = 'Fail'
       self.templog['descr'] = "Mapped privileged ports found"
@@ -251,17 +254,17 @@ class ContainerRuntimeAudit(Audit):
     return self.add_check_results('privileged_ports')
 
   @assign_order(9)
-  def open_ports(self,hostports):
+  def open_ports(self,hostports=None):
     """5.9 Open only needed ports on container"""
     exclude = defaultdict(list)
     mappings = defaultdict(list)
-    for k,v in hostports.iteritems():
-      exclude[k].append(v)
+    if hostports != None:
+      for k,v in hostports.iteritems():
+        exclude[k].append(v)
     try:
       for cont in self.running:
         info = self.cli.inspect_container(cont)
-        contimg = info['Image']
-        ports = info['Ports']
+        ports = info['Image']['Ports']
         for port in ports:
           try:
             exp_port = port['PrivatePort']
@@ -271,7 +274,10 @@ class ContainerRuntimeAudit(Audit):
     except TypeError:
       return None
 
-    privports = self.compare_dicts(mappings,exclude)
+    if exclude:
+      privports = self.compare_dicts(mappings,exclude)
+    else:
+      privports = mappings
 
     if privports:
       self.templog['status'] = 'Fail'
@@ -394,7 +400,7 @@ class ContainerRuntimeAudit(Audit):
           try:
             hostip = port['IP']
             if hostip == '0.0.0.0':
-              pubport = port['PublicPort']
+              pubport = port['HostPort']
               mappings[contimg].append(pubport)
           except KeyError:
             continue

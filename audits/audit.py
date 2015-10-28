@@ -30,11 +30,12 @@ class Audit:
     args = []
     func = audit.keys()[0]
     for argument in audit.values():
-      for key,value in argument.iteritems():
-        args.append(value)
+      if type(argument) == dict:
+        for key,value in argument.iteritems():
+          args.append(value)
     try:
       return getattr(self,func)(*args)
-    except :
+    except AttributeError:
       return logging.error("No audit named %s" %(func))
 
   def run_audits(self,audits):

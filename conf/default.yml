@@ -82,10 +82,10 @@ container_runtime:
   - mounted_hostdirs          #5.6 Do not mount sensitive host system directories on containers
   - ssh_running               #5.7 Do not run ssh within containers
   - privileged_ports:         #5.8 Do not map privileged ports within containers
-      ignore:
-  #      <image_name>: <port>
+      # ignore:
+      #   <image_name>: <port>
   - open_ports:               #5.9 Open only needed ports on container
-      ignore:
+  #    ignore:
   #      <image_name>: <port>
   - host_network_mode         #5.10 Do not use host network mode on container 
   - memory_usage_limit        #5.11 Limit memory usage for container
