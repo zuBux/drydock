@@ -227,13 +227,14 @@ class ContainerRuntimeAudit(Audit):
     try:
       for cont in self.running:
         info = self.cli.inspect_container(cont)
+        img_name = info['Config']['Image']
         ports = info['NetworkSettings']['Ports']
         for mappings in ports.values():
           for mapping in mappings:
             try:
               pubport = int(mapping['HostPort'])
               if pubport < 1024:
-                bad_mappings[cont].append(pubport)
+                bad_mappings[img_name].append(pubport)
             except KeyError:
               continue
     except TypeError:
@@ -243,7 +244,6 @@ class ContainerRuntimeAudit(Audit):
       privports = self.compare_dicts(bad_mappings,exclude)
     else:
       privports = bad_mappings
-      
     if privports:
       self.templog['status'] = 'Fail'
       self.templog['descr'] = "Mapped privileged ports found"
@@ -264,25 +264,22 @@ class ContainerRuntimeAudit(Audit):
     try:
       for cont in self.running:
         info = self.cli.inspect_container(cont)
-        ports = info['Image']['Ports']
-        for port in ports:
-          try:
-            exp_port = port['PrivatePort']
-            mappings[contimg].append(exp_port)
-          except KeyError:
-            continue
+        img_name = info['Config']['Image']
+        ports = info['NetworkSettings']['Ports']
+        for port in ports.keys():
+          mappings[img_name].append(port)
     except TypeError:
+      logging.error("Abort check")
       return None
 
     if exclude:
-      privports = self.compare_dicts(mappings,exclude)
+      openports = self.compare_dicts(mappings,exclude)
     else:
-      privports = mappings
-
-    if privports:
+      openports = mappings
+    if openports:
       self.templog['status'] = 'Fail'
       self.templog['descr'] = "Uneeded exposed ports found"
-      self.templog['output'] = [(v, k) for k, v in privports.iteritems()]
+      self.templog['output'] = [(v, k) for k, v in openports.iteritems()]
     else:
       self.templog['status'] = 'Pass'
       self.templog['descr'] = 'Only needed ports are exposed'

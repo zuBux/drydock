@@ -99,13 +99,12 @@ class Audit:
     """
     Compares keys,values of two dicts and produces a dict with their diff
     """
-    diff = defaultdict(list)
-    for key in source:
-      if key in exclude:
+    for key in source.keys():
+      if key in exclude.keys():
         for port in source[key]:
-          if not port in exclude[key]:
-            diff[key].append(port)
-    return diff
+          if port in exclude[key]:
+            source.pop(key,None)
+    return source
 
   def version_check(self, ver_soft, ver_ref ):
     """ Compares software version with a given value"""
