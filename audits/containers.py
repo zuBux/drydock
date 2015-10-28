@@ -57,6 +57,7 @@ class ContainerRuntimeAudit(Audit):
     else:
       self.templog['status'] = 'Pass'
       self.templog['descr'] = "All containers have AppArmor profiles"
+    print self.templog
 
     return self.add_check_results('verify_apparmor')
     
@@ -388,7 +389,7 @@ class ContainerRuntimeAudit(Audit):
       for cont in self.running:
         info = self.cli.inspect_container(cont)
         contimg = info['Image']
-        ports = info['Ports']
+        ports = contimg['Ports']
         for port in ports:
           try:
             hostip = port['IP']
