@@ -83,10 +83,10 @@ container_runtime:
   - ssh_running               #5.7 Do not run ssh within containers
   - privileged_ports:         #5.8 Do not map privileged ports within containers
       ignore:
-        bottle_img: 80
+  #      <image_name>: <port>
   - open_ports:               #5.9 Open only needed ports on container
       ignore:
-        bottle_img: 8080
+  #      <image_name>: <port>
   - host_network_mode         #5.10 Do not use host network mode on container 
   - memory_usage_limit        #5.11 Limit memory usage for container
   - cpu_priority              #5.12 Set container CPU priority appropriately
