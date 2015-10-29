@@ -31,8 +31,7 @@ class ContainerImgAudit(Audit):
     else:
       self.templog['status'] = 'Pass'
       self.templog['descr'] = "No container running as root"
-      
-    return self.add_check_results('container_user')
+    return self.templog
 
 
 class ContainerRuntimeAudit(Audit):
@@ -57,7 +56,7 @@ class ContainerRuntimeAudit(Audit):
     else:
       self.templog['status'] = 'Pass'
       self.templog['descr'] = "All containers have AppArmor profiles"
-    return self.add_check_results('verify_apparmor')
+    return self.templog
     
   @assign_order(2)
   def verify_selinux(self):
@@ -80,8 +79,7 @@ class ContainerRuntimeAudit(Audit):
     else:
       self.templog['status'] = 'Pass'
       self.templog['descr'] = "All containers have SELinux policies"
-
-    return self.add_check_results('verify_selinux')
+    return self.templog
 
   @assign_order(3)
   def single_process(self):
@@ -105,8 +103,7 @@ class ContainerRuntimeAudit(Audit):
     else:
       self.templog['status'] = 'Pass'
       self.templog['descr'] = "All containers have one main single process"
-
-    return self.add_check_results('single_process')
+    return self.templog
 
   @assign_order(4)
   def kernel_capabilities(self):
@@ -135,8 +132,7 @@ class ContainerRuntimeAudit(Audit):
     else:
       self.templog['status'] = 'Pass'
       self.templog['descr'] = "All containers have proper restart policy"
-
-    return self.add_check_results('kernel_capabilities')
+    return self.templog
 
   @assign_order(5)
   def privileged_containers(self):
@@ -160,8 +156,7 @@ class ContainerRuntimeAudit(Audit):
     else:
       self.templog['status'] = 'Pass'
       self.templog['descr'] = "No privileged containers detected."
-
-    return self.add_check_results('privileged_containers')
+    return self.templog
 
   @assign_order(6)
   def mounted_hostdirs(self):
@@ -187,8 +182,7 @@ class ContainerRuntimeAudit(Audit):
     else:
       self.templog['status'] = 'Pass'
       self.templog['descr'] = 'No sensitive dirs mounted'
-
-    return self.add_check_results('mounted_hostdirs')
+    return self.templog
 
   @assign_order(7)
   def ssh_running(self):
@@ -213,7 +207,7 @@ class ContainerRuntimeAudit(Audit):
       self.templog['status'] = 'Pass'
       self.templog['descr'] = "No container is running ssh"
 
-    return self.add_check_results('ssh_running')
+    return self.templog
 
   @assign_order(8)
   def privileged_ports(self,ignore_ports=None):
@@ -251,7 +245,7 @@ class ContainerRuntimeAudit(Audit):
     else:
       self.templog['status'] = 'Pass'
       self.templog['descr'] = 'No unauthorized privileged ports found'
-    return self.add_check_results('privileged_ports')
+    return self.templog
 
   @assign_order(9)
   def open_ports(self,hostports=None):
@@ -283,7 +277,7 @@ class ContainerRuntimeAudit(Audit):
     else:
       self.templog['status'] = 'Pass'
       self.templog['descr'] = 'Only needed ports are exposed'
-    return self.add_check_results('open_ports')
+    return self.templog
 
   @assign_order(10)
   def host_network_mode(self):
@@ -308,7 +302,7 @@ class ContainerRuntimeAudit(Audit):
       self.templog['status'] = 'Pass'
       self.templog['descr'] = "All containers are inside a seperate network stack"
 
-    return self.add_check_results('host_network_mode')
+    return self.templog
 
   @assign_order(11)
   def memory_usage_limit(self):
@@ -332,7 +326,7 @@ class ContainerRuntimeAudit(Audit):
       self.templog['status'] = 'Pass'
       self.templog['descr'] = "All containers have memory limits in place"
 
-    return self.add_check_results('memory_usage_limit')
+    return self.templog
 
   @assign_order(12)
   #1024 also means no shares.SHOULD FIX
@@ -357,7 +351,8 @@ class ContainerRuntimeAudit(Audit):
       self.templog['status'] = 'Pass'
       self.templog['descr'] = "All containers have CPU shares in place"
 
-    return self.add_check_results('cpu_priority')
+    #return self.add_check_results('cpu_priority')
+    return self.templog
 
   @assign_order(13)
   def readonly_root_fs(self):
@@ -381,37 +376,38 @@ class ContainerRuntimeAudit(Audit):
     else:
       self.templog['status'] = 'Pass'
       self.templog['descr'] = "All containers have read-only root FS"
-
-    return self.add_check_results('readonly_root_fs')
+    return self.templog
 
   @assign_order(14)
   def bind_host_interface(self):
     """5.14 Bind incoming container traffic to a specific host interface"""
-    mappings = defaultdict(list)
+    bad_interface = defaultdict(list)
     try:
       for cont in self.running:
         info = self.cli.inspect_container(cont)
         contimg = info['Image']
-        ports = contimg['Ports']
-        for port in ports:
-          try:
-            hostip = port['IP']
-            if hostip == '0.0.0.0':
-              pubport = port['HostPort']
-              mappings[contimg].append(pubport)
-          except KeyError:
-            continue
+        ports = info['NetworkSettings']['Ports']
+        for mappings in ports.values():
+          for mapping in mappings:
+            try:
+              hostip = mapping['HostIp']
+              if hostip == '0.0.0.0':
+                pubport = mapping['HostPort']
+                bad_interface[contimg].append(pubport)
+            except KeyError:
+              continue
     except TypeError:
       return None
 
     if mappings:
       self.templog['status'] = 'Fail'
       self.templog['descr'] = "Containers listen to any host interface"
-      self.templog['output'] = [(v, k) for k, v in mappings.iteritems()]
+      self.templog['output'] = [(v, k) for k, v in bad_interface.iteritems()]
     else:
       self.templog['status'] = 'Pass'
       self.templog['descr'] = 'Traffic bound to specific host interface'
-    return self.add_check_results('bind_host_interface')
+    #return self.add_check_results('bind_host_interface')
+    return self.templog
 
   @assign_order(15)
   def failure_restart_policy(self):
@@ -438,8 +434,7 @@ class ContainerRuntimeAudit(Audit):
     else:
       self.templog['status'] = 'Pass'
       self.templog['descr'] = "All containers have proper restart policy"
-
-    return self.add_check_results('failure_restart_policy')
+    return self.templog
 
   @assign_order(16)
   def host_process_namespace(self):
@@ -463,7 +458,7 @@ class ContainerRuntimeAudit(Audit):
     else:
       self.templog['status'] = 'Pass'
       self.templog['descr'] = "All containers' process namespace is isolated"
-    return self.add_check_results('host_process_namespace')
+    return self.templog
 
   @assign_order(17)
   def host_ipc_namespace(self):
@@ -487,7 +482,7 @@ class ContainerRuntimeAudit(Audit):
     else:
       self.templog['status'] = 'Pass'
       self.templog['descr'] = "All containers' process namespace is isolated"
-    return self.add_check_results('host_ipc_namespace')
+    return self.templog
 
   @assign_order(18)
   def expose_host_devices(self):
@@ -509,4 +504,4 @@ class ContainerRuntimeAudit(Audit):
                                 for k, v in containers_exposed.iteritems()]
     else:
       self.templog['descr'] = "No host devices exposed to containers"
-    return self.add_check_results('expose_host_devices')
+    return self.templog

@@ -11,8 +11,8 @@ from utils.output import FormattedOutput
 def main():
   #Argument parsing.
   confparser = ConfParse()
-
   parser = argparse.ArgumentParser()
+
   parser.add_argument("-p", "--profile", help="Audit configuration file")
   parser.add_argument("-o", "--output", help="Output file")
   parser.add_argument("-v", "--verbosity", help="Verbosity level")

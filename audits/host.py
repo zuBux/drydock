@@ -28,8 +28,7 @@ class HostConfAudit(Audit):
       else:
         self.templog['status'] = "Fail"
         self.templog['descr'] = "No seperate partition for containers"
-    
-    return self.add_check_results('check_seperate_partition')
+    return self.templog
 
   @assign_order(2)
   def check_kernel_ver(self,ver=kern_ver):
@@ -43,8 +42,7 @@ class HostConfAudit(Audit):
       self.templog['status'] = "Fail"
       self.templog['descr'] =  "Host uses an outdated kernel"
     self.templog['output'] = version
-   
-    return self.add_check_results('check_kernel_ver')
+    return self.templog
 
 #Enhancement - Add a list of essential ports
   @assign_order(3)
@@ -57,9 +55,9 @@ class HostConfAudit(Audit):
         openports.append([con[3][0],con[3][1]])
     self.templog['descr'] = "Host has %d open ports" %(len(openports))
     self.templog['output'] = openports
-    return self.add_check_results('check_listening_srv')
+    return self.templog
 
-  @assign_order(2)
+  @assign_order(4)
   def check_docker_ver(self,ver):
     """1.6 Keep Docker up to date"""
     cli = self.cli
@@ -72,20 +70,19 @@ class HostConfAudit(Audit):
       self.templog['status'] = "Fail"
       self.templog['descr'] =  "Host uses an outdated Docker version"
     self.templog['output'] = version
-   
-    return self.add_check_results('check_docker_ver')
+    return self.templog
 
 #Enhancement - Add a list of trusted users
-  @assign_order(4)
+  @assign_order(5)
   def list_trusted_users(self):
     """1.7 Only allow trusted users to control Docker daemon"""
     dockergroup = getgrnam('docker')
     users = dockergroup[3]
     self.templog['descr'] = "%d users in docker group" %(len(users))
     self.templog['output'] = users
-    return self.add_check_results('list_trusted_users')
+    return self.templog
 
-  @assign_order(5)
+  @assign_order(6)
   def check_auditd_rules(self,rules):
     """1.8 - 1.19 Audit docker daemon, files and directories"""
     found = []
@@ -110,6 +107,5 @@ class HostConfAudit(Audit):
     else:
       self.templog['status'] = "Pass"
       self.templog['descr'] = "All auditd rules are in place"      
-
     self.templog['output'] = results
-    return self.add_check_results('check_auditd_rules')
+    return self.templog

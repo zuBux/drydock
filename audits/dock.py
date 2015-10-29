@@ -73,8 +73,8 @@ class DockerFileAudit(Audit):
       self.templog['status'] = "Pass"
       self.templog['descr'] = "All files have appropriate permissions"
     
-    self.add_check_results('check_permissions')
-    return
+    #self.add_check_results('check_permissions')
+    return self.templog
 
   #Enhancement - If path is directory, do the check recursively
   @assign_order(2)
@@ -108,8 +108,8 @@ class DockerFileAudit(Audit):
       self.templog['status'] = "Pass"
       self.templog['descr'] = "File user and group owner are correct"
 
-    self.add_check_results('check_owner')
-    return
+    #self.add_check_results('check_owner')
+    return self.templog
 
 class DockerConfAudit(Audit):
   """Checks assosiated with Docker server configuration"""
@@ -136,7 +136,8 @@ class DockerConfAudit(Audit):
     else:
       self.templog['status'] = "Pass"
       self.templog['descr'] = "No insecure arguments found"
-    return self.add_check_results('check_unwanted_args')
+    #return self.add_check_results('check_unwanted_args')
+    return self.templog
 
   @assign_order(2)
   def check_wanted_args(self,args):
@@ -161,5 +162,6 @@ class DockerConfAudit(Audit):
       self.templog['status'] = "Pass"
       self.templog['descr'] = "Docker is running with security hardening arguments"
 
-    return self.add_check_results('check_wanted_args')
+    #return self.add_check_results('check_wanted_args')
+    return self.templog
   

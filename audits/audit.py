@@ -42,16 +42,18 @@ class Audit:
     for audit in audits:
       if (type(audit) == str):
         logging.debug("Running %s with no args" %audit)
-        self.call(audit)
+        res = self.call(audit)
+        self.add_check_results(audit,res)
       else:     
         logging.debug("Running %s with args %s" \
-                      %(audit.keys(), audit.values()))
-        self.call_with_args(audit)
+                      %(audit.keys()[0], audit.values()))
+        res = self.call_with_args(audit)
+        self.add_check_results(audit.keys()[0],res)
     return 
 
-  def add_check_results(self,audit_name):
+  def add_check_results(self,audit_name,results):
     """Adds audit results to output dict"""
-    self.logdict[audit_name] = self.templog
+    self.logdict[audit_name] = results
     self.templog = {}
     return
 
