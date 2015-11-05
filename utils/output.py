@@ -63,6 +63,8 @@ class FormattedOutput:
             allchecks = allchecks +1
           else :
             allchecks = allchecks +1
+        except TypeError:
+          continue
         except KeyError:
           continue
     return passed, allchecks
@@ -74,6 +76,8 @@ class FormattedOutput:
       elif results['status'] == 'Fail':
         print ("Status: " + Fore.RED + 'Fail' + Fore.RESET)
     except KeyError:
+      pass
+    except TypeError:
       pass
     print "Description: " + results['descr']
     try:
@@ -106,6 +110,19 @@ class FormattedOutput:
                  }
 
     print '''drydock v0.2 Audit Results\n==========================\n'''
+    #Print results
+    for cat, catdescr in auditcats.iteritems():
+      cat_inst = self.audit_categories[cat]
+      if output[cat]:
+        audits = self.create_ordereddict(output[cat],cat)
+        print(Style.BRIGHT + "\n" + catdescr + "\n" + \
+              '-'*len(catdescr) + '\n'+ Style.RESET_ALL)
+        for audit in audits.keys():
+          results = output[cat][audit]
+          descr = getattr(cat_inst,audit).__doc__
+          print( descr + '\n' + '-'*len(descr) ) 
+          self.print_results(results)
+          
     #Print Overview info for the audit
     print(Style.BRIGHT + "Overview\n--------" +Style.RESET_ALL)
     print('Profile: ' + output['info']['profile'])
@@ -119,15 +136,3 @@ class FormattedOutput:
       print('Score: ' + Fore.YELLOW + output['info']['score'] + Fore.RESET)
     else:
       print('Score: ' + Fore.GREEN + output['info']['score'] + Fore.RESET)
-    #Print results
-    for cat, catdescr in auditcats.iteritems():
-      cat_inst = self.audit_categories[cat]
-      if output[cat]:
-        audits = self.create_ordereddict(output[cat],cat)
-        print(Style.BRIGHT + "\n" + catdescr + "\n" + \
-              '-'*len(catdescr) + '\n'+ Style.RESET_ALL)
-        for audit in audits.keys():
-          results = output[cat][audit]
-          descr = getattr(cat_inst,audit).__doc__
-          print( descr + '\n' + '-'*len(descr) ) 
-          self.print_results(results)

@@ -63,7 +63,14 @@ class Audit:
     """
     cont_ids = []
     cli = self.cli
-    running_cont = cli.containers()
+    try:
+      running_cont = cli.containers()
+    except:
+      logging.error("Unable to connect to docker host. \
+                    Verify that current user has permissions to use %s\
+                    Aborting audit..." %(BASE_URL))
+      sys.exit(0)
+
     if len(running_cont):
       for cont in running_cont:
         cont_ids.append(cont['Id'])
