@@ -15,12 +15,10 @@ class HostConfAudit(Audit):
   def __init__(self,url='unix://var/run/docker.sock', cert=None, key=None):
     super(HostConfAudit, self).__init__()
     if cert and key:
-      print "hostconf %s %s" %(cert,key)
       tls_config = tls.TLSConfig(verify=False, assert_hostname = False,\
                                         client_cert = (cert, key))
       self.cli = Client(base_url = url, tls = tls_config)
     else:
-      print "hostconfaudit %s" %url
       self.cli = Client(base_url = url)
 
   @assign_order(1)
