@@ -8,13 +8,12 @@ from collections import defaultdict
 from utils.decorators import assign_order
 
 
-
 class ContainerImgAudit(Audit):
 
   def __init__(self,url='unix://var/run/docker.sock', cert=None, key=None):
     super(ContainerImgAudit, self).__init__()
     if cert and key:
-      tls_config = tls.TLSConfig(verify=False,assert_hostname = False,\
+      tls_config = tls.TLSConfig(verify=False, assert_hostname = False,\
                                         client_cert = (cert, key))
       print tls_config
       self.cli = Client(base_url = url, tls = tls_config)
@@ -148,12 +147,12 @@ class ContainerRuntimeAudit(Audit):
 
     if len(container_caps):
       self.templog['status'] = 'Fail'
-      self.templog['descr'] = "%d container(s) have bad restart policy"\
+      self.templog['descr'] = "Kernel capabilities found"\
                               %len(container_caps)
       self.templog['output'] = container_caps
     else:
       self.templog['status'] = 'Pass'
-      self.templog['descr'] = "All containers have proper restart policy"
+      self.templog['descr'] = "No kernel capabilities within containers"
     return self.templog
 
   @assign_order(5)
@@ -431,7 +430,6 @@ class ContainerRuntimeAudit(Audit):
     else:
       self.templog['status'] = 'Pass'
       self.templog['descr'] = 'Traffic bound to specific host interface'
-    #return self.add_check_results('bind_host_interface')
     return self.templog
 
   @assign_order(15)

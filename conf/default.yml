@@ -86,7 +86,7 @@ container_runtime:
       #   <image_name>: <port>
   - open_ports:               #5.9 Open only needed ports on container
   #    ignore:
-  #      <image_name>: <port>
+  #      <image_name>: <port/proto> e.x 80/tcp
   - host_network_mode         #5.10 Do not use host network mode on container 
   - memory_usage_limit        #5.11 Limit memory usage for container
   - cpu_priority              #5.12 Set container CPU priority appropriately

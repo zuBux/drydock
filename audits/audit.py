@@ -114,7 +114,8 @@ class Audit(object):
     return source
 
   def version_check(self, ver_soft, ver_ref ):
-    """ Compares software version with a given value"""
+    """ Compares software version with a given value.
+        Returns true if ver_soft is >= ver_ref"""
     ver_num = ver_soft.split('-')[0]
     ver_soft = ver_num.split('.')
     ver_ref = ver_ref.split('.')
