@@ -399,7 +399,7 @@ class ContainerRuntimeAudit(Audit):
     except TypeError:
       return None
 
-    if mappings:
+    if bad_interface:
       self.templog['status'] = 'Fail'
       self.templog['descr'] = "Containers listen to any host interface"
       self.templog['output'] = [(v, k) for k, v in bad_interface.iteritems()]
