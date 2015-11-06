@@ -254,7 +254,7 @@ class ContainerRuntimeAudit(Audit):
               except KeyError:
                 continue
         except TypeError:
-          logging.error("No port mappings")
+          logging.info("No port mappings")
           continue
     if exclude:
       privports = self.compare_dicts(bad_mappings,exclude)

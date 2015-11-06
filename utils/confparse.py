@@ -15,6 +15,3 @@ class ConfParse:
       logging.error("Invalid file specified: %s" %(conf)) 
       sys.exit(0)
     return profile
-
-  def select_key(self,prof,key):
-    return prof[key]

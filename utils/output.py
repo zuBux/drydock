@@ -111,15 +111,19 @@ class FormattedOutput:
     #Print results
     for cat, catdescr in auditcats.iteritems():
       cat_inst = self.audit_categories[cat]
-      if output[cat]:
-        audits = self.create_ordereddict(output[cat],cat)
-        print(Style.BRIGHT + "\n" + catdescr + "\n" + \
-              '-'*len(catdescr) + '\n'+ Style.RESET_ALL)
-        for audit in audits.keys():
-          results = output[cat][audit]
-          descr = getattr(cat_inst,audit).__doc__
-          print( descr + '\n' + '-'*len(descr) ) 
-          self.print_results(results)
+      try:
+        if output[cat]:
+          audits = self.create_ordereddict(output[cat],cat)
+          print(Style.BRIGHT + "\n" + catdescr + "\n" + \
+                '-'*len(catdescr) + '\n'+ Style.RESET_ALL)
+          for audit in audits.keys():
+            results = output[cat][audit]
+            descr = getattr(cat_inst,audit).__doc__
+            print( descr + '\n' + '-'*len(descr) ) 
+            self.print_results(results)
+      except KeyError:
+        logging.warn("No audit category %s" %auditcats[cat])
+        continue
           
     #Print Overview info for the audit
     print(Style.BRIGHT + "Overview\n--------" +Style.RESET_ALL)

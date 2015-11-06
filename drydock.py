@@ -76,13 +76,14 @@ def main():
 
   out = FormattedOutput(outfile, **audit_categories)
   for cat,auditclass in audit_categories.iteritems():
-    try:
-      auditcat = confparser.select_key(profile,cat)
-      audit = auditclass
-      audit.run_audits(auditcat)
-      out.save_results(cat, audit.logdict)
-    except KeyError:
-      logging.error("No audit category '%s' defined." %cat)
+    if cat in profile.keys():
+      try:
+        auditcat = profile[cat]
+        audit = auditclass
+        audit.run_audits(auditcat)
+        out.save_results(cat, audit.logdict)
+      except KeyError:
+        logging.error("No audit category '%s' defined." %cat)
 
   out.audit_init_info(conf)
   out.write_file()
