@@ -7,13 +7,21 @@ import logging
 from utils.decorators import assign_order
 from grp import getgrnam
 from audit import Audit
-from docker import Client
+from docker import Client,tls
 
 
 class HostConfAudit(Audit):
 
-  #Default values
-  kern_ver = '3.10' #kernel version
+  def __init__(self,url='unix://var/run/docker.sock', cert=None, key=None):
+    super(HostConfAudit, self).__init__()
+    if cert and key:
+      print "hostconf %s %s" %(cert,key)
+      tls_config = tls.TLSConfig(verify=False, assert_hostname = False,\
+                                        client_cert = (cert, key))
+      self.cli = Client(base_url = url, tls = tls_config)
+    else:
+      print "hostconfaudit %s" %url
+      self.cli = Client(base_url = url)
 
   @assign_order(1)
   def check_seperate_partition(self):
@@ -31,7 +39,7 @@ class HostConfAudit(Audit):
     return self.templog
 
   @assign_order(2)
-  def check_kernel_ver(self,ver=kern_ver):
+  def check_kernel_ver(self,ver):
     """1.2 Use the updated kernel version"""
     version = self.cli.version()['KernelVersion']
     isupdate = self.version_check(version,ver)

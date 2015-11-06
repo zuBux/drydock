@@ -3,14 +3,28 @@ import stat
 import psutil
 import logging
 from audit import Audit
-from docker import Client
+from docker import Client,tls
 from collections import defaultdict
 from utils.decorators import assign_order
 
 
 
 class ContainerImgAudit(Audit):
-  
+
+  def __init__(self,url='unix://var/run/docker.sock', cert=None, key=None):
+    super(ContainerImgAudit, self).__init__()
+    #self.cli = Client(base_url= url)
+    if cert and key:
+      print "contimg %s %s" %(cert,key)
+      tls_config = tls.TLSConfig(verify=False,assert_hostname = False,\
+                                        client_cert = (cert, key))
+      print tls_config
+      self.cli = Client(base_url = url, tls = tls_config)
+    else:
+      print "contimgaudit %s" %url
+      self.cli = Client(base_url = url)
+    self.running = self.running_containers()
+
   @assign_order(1)     
   def container_user(self):
     """4.1 Create a user for the container"""
@@ -35,6 +49,17 @@ class ContainerImgAudit(Audit):
 
 
 class ContainerRuntimeAudit(Audit):
+
+  def __init__(self,url='unix://var/run/docker.sock', cert=None, key=None):
+    super(ContainerRuntimeAudit, self).__init__()
+    if cert and key:
+      print "contrun %s %s" %(cert,key)
+      tls_config = tls.TLSConfig(verify = False,assert_hostname = False,\
+                                        client_cert = (cert, key))
+      self.cli = Client(base_url = url, tls = tls_config)
+    else:
+      self.cli = Client(base_url = url)
+    self.running = self.running_containers()
 
   @assign_order(1)
   def verify_apparmor(self):

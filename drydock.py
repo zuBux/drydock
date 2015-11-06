@@ -16,6 +16,9 @@ def main():
   parser.add_argument("-p", "--profile", help="Audit configuration file")
   parser.add_argument("-o", "--output", help="Output file")
   parser.add_argument("-v", "--verbosity", help="Verbosity level")
+  parser.add_argument("-d", "--host", help="Docker host")
+  parser.add_argument("-c", "--cert", help="Client certificate")
+  parser.add_argument("-k", "--key", help="Client certificate key")
   args = parser.parse_args()
 
   #Verbosity level - Default is ERROR
@@ -44,17 +47,34 @@ def main():
     outfile = args.output
   else:
     outfile = "output.json"
+  if args.host:
+    host = args.host
+  if args.cert:
+    cert = args.cert
+  if args.key:
+    key = args.key
 
-  out = FormattedOutput(outfile)
-  profile =confparser.load_conf(conf)
 
-  audit_categories = {'host':HostConfAudit(),
+
+  profile = confparser.load_conf(conf)
+  audit_categories = {
                       'dockerconf': DockerConfAudit(),
                       'dockerfiles': DockerFileAudit(),
-                      'container_imgs': ContainerImgAudit(),
-                      'container_runtime': ContainerRuntimeAudit(),
                       }
-  
+  if args.host and args.cert and args.key:
+    audit_categories['host'] = HostConfAudit(url=host, cert=cert, key=key)
+    audit_categories['container_imgs'] = ContainerImgAudit(url=host, cert=cert, key=key)
+    audit_categories['container_runtime'] = ContainerRuntimeAudit(url=host, cert=cert, key=key)
+  elif args.host:
+    audit_categories['host'] = HostConfAudit(url=host)
+    audit_categories['container_imgs'] = ContainerImgAudit(url=host)
+    audit_categories['container_runtime'] = ContainerRuntimeAudit(url=host)
+  else:
+    audit_categories['host'] = HostConfAudit()
+    audit_categories['container_imgs'] = ContainerImgAudit()
+    audit_categories['container_runtime'] = ContainerRuntimeAudit()
+
+  out = FormattedOutput(outfile, **audit_categories)
   for cat,auditclass in audit_categories.iteritems():
     try:
       auditcat = confparser.select_key(profile,cat)

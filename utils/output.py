@@ -12,16 +12,14 @@ from audits.containers import ContainerImgAudit, ContainerRuntimeAudit
 
 class FormattedOutput:
 
-  def __init__(self,outfile):
+  def __init__(self,outfile,**kwargs):
     self.output = outfile
     self.log = {}
-    self.audit_categories = {'host':HostConfAudit(),
-                  'dockerconf': DockerConfAudit(),
-                  'dockerfiles': DockerFileAudit(),
-                  'container_imgs': ContainerImgAudit(),
-                  'container_runtime': ContainerRuntimeAudit(),
-                  }
-    init()
+    self.audit_categories = {}
+    for key in kwargs:
+      self.audit_categories[key] = kwargs[key]
+
+    #init()
 
   def audit_init_info(self,profile):
     info = {}

@@ -7,7 +7,7 @@ from collections import defaultdict
 
 BASE_URL = 'unix://var/run/docker.sock'
 
-class Audit:
+class Audit(object):
 
   def __init__(self):
     #logdict stores the results of the audit category,
@@ -15,8 +15,8 @@ class Audit:
     #and gets cleared after each check
     self.logdict = {}
     self.templog = {}
-    self.cli = Client(base_url= BASE_URL)
-    self.running = self.running_containers()
+    #self.cli = Client(base_url= BASE_URL)
+
 
   def call(self,audit):
     """Reads YML profile and calls the equivelent method"""
