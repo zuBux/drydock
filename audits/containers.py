@@ -50,6 +50,7 @@ class ContainerRuntimeAudit(Audit):
   def __init__(self,url='unix://var/run/docker.sock', cert=None, key=None):
     super(ContainerRuntimeAudit, self).__init__()
     if cert and key:
+      print "contrun %s %s" %(cert,key)
       tls_config = tls.TLSConfig(verify = False,assert_hostname = False,\
                                         client_cert = (cert, key))
       self.cli = Client(base_url = url, tls = tls_config)
@@ -239,22 +240,23 @@ class ContainerRuntimeAudit(Audit):
     if ignore_ports != None:
       for k,v in ignore_ports.iteritems():
         exclude[k].append(v)
-    try:
+
       for cont in self.running:
         info = self.cli.inspect_container(cont)
         img_name = info['Config']['Image']
         ports = info['NetworkSettings']['Ports']
-        for mappings in ports.values():
-          for mapping in mappings:
-            try:
-              pubport = int(mapping['HostPort'])
-              if pubport < 1024:
-                bad_mappings[img_name].append(pubport)
-            except KeyError:
-              continue
-    except TypeError:
-      logging.error("No running containers")
-      return None
+        try:
+          for mappings in ports.values():
+            for mapping in mappings:
+              try:
+                pubport = int(mapping['HostPort'])
+                if pubport < 1024:
+                  bad_mappings[img_name].append(pubport)
+              except KeyError:
+                continue
+        except TypeError:
+          logging.error("No port mappings")
+          continue
     if exclude:
       privports = self.compare_dicts(bad_mappings,exclude)
     else:
@@ -403,11 +405,12 @@ class ContainerRuntimeAudit(Audit):
   def bind_host_interface(self):
     """5.14 Bind incoming container traffic to a specific host interface"""
     bad_interface = defaultdict(list)
-    try:
-      for cont in self.running:
-        info = self.cli.inspect_container(cont)
-        contimg = info['Image']
-        ports = info['NetworkSettings']['Ports']
+
+    for cont in self.running:
+      info = self.cli.inspect_container(cont)
+      contimg = info['Image']
+      ports = info['NetworkSettings']['Ports']
+      try:
         for mappings in ports.values():
           for mapping in mappings:
             try:
@@ -417,8 +420,9 @@ class ContainerRuntimeAudit(Audit):
                 bad_interface[contimg].append(pubport)
             except KeyError:
               continue
-    except TypeError:
-      return None
+      except TypeError:
+        logging.info("No port mappings")
+        continue
 
     if bad_interface:
       self.templog['status'] = 'Fail'

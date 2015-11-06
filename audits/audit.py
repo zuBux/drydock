@@ -15,8 +15,6 @@ class Audit(object):
     #and gets cleared after each check
     self.logdict = {}
     self.templog = {}
-    #self.cli = Client(base_url= BASE_URL)
-
 
   def call(self,audit):
     """Reads YML profile and calls the equivelent method"""
