@@ -19,11 +19,11 @@ Since there are audits which require administrative privileges (e.x examining au
 Assuming that your Docker daemon uses unix sockets (default configuration), the following options are available:
 
 * -o <file_name> : Specifies the path where JSON output will be saved. Switches to output.json if none specified.
-* -p <profile> : The profile which will be used for the audit. Switches to conf/default.yaml if none specified.
-* -v <verbosity> : Use values 1,2 or 3 to change verbosity level to ERROR, WARNING or DEBUG accordingly. Default is 1
+* -p <path to profile> : The profile which will be used for the audit. Switches to conf/default.yaml if none specified.
+* -v <verbosity> : Use values 1, 2 or 3 to change verbosity level to ERROR, WARNING or DEBUG accordingly. Default is 1
 
 ### Remote Docker host
-If your Docker daemon listens to an exposed port, using TLS, you must provide the following :
+If your Docker daemon listens on an exposed port, using TLS, you must provide the following :
 
 * -d <IP:port> Docker daemon IP and listening port
 * -c <path> Client certificate
