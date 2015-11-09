@@ -13,12 +13,12 @@ def main():
   confparser = ConfParse()
   parser = argparse.ArgumentParser()
 
-  parser.add_argument("-p", "--profile", help="Audit configuration file")
-  parser.add_argument("-o", "--output", help="Output file")
-  parser.add_argument("-v", "--verbosity", help="Verbosity level")
-  parser.add_argument("-d", "--host", help="Docker host")
-  parser.add_argument("-c", "--cert", help="Client certificate")
-  parser.add_argument("-k", "--key", help="Client certificate key")
+  parser.add_argument("-p", "--profile", help = "Audit configuration file")
+  parser.add_argument("-o", "--output", help = "Output file")
+  parser.add_argument("-v", "--verbosity", help = "Verbosity level")
+  parser.add_argument("-d", "--daemon", help = "Docker daemon host <IP:port>")
+  parser.add_argument("-c", "--cert", help = "Client certificate")
+  parser.add_argument("-k", "--key", help = "Client certificate key")
   args = parser.parse_args()
 
   #Verbosity level - Default is ERROR
@@ -47,8 +47,8 @@ def main():
     outfile = args.output
   else:
     outfile = "output.json"
-  if args.host:
-    host = args.host
+  if args.daemon:
+    daemon = args.daemon
   if args.cert:
     cert = args.cert
   if args.key:
@@ -61,14 +61,14 @@ def main():
                       'dockerconf': DockerConfAudit(),
                       'dockerfiles': DockerFileAudit(),
                       }
-  if args.host and args.cert and args.key:
-    audit_categories['host'] = HostConfAudit(url=host, cert=cert, key=key)
-    audit_categories['container_imgs'] = ContainerImgAudit(url=host, cert=cert, key=key)
-    audit_categories['container_runtime'] = ContainerRuntimeAudit(url=host, cert=cert, key=key)
-  elif args.host:
-    audit_categories['host'] = HostConfAudit(url=host)
-    audit_categories['container_imgs'] = ContainerImgAudit(url=host)
-    audit_categories['container_runtime'] = ContainerRuntimeAudit(url=host)
+  if args.daemon and args.cert and args.key:
+    audit_categories['host'] = HostConfAudit(url=daemon, cert=cert, key=key)
+    audit_categories['container_imgs'] = ContainerImgAudit(url=daemon, cert=cert, key=key)
+    audit_categories['container_runtime'] = ContainerRuntimeAudit(url=daemon, cert=cert, key=key)
+  elif args.daemon:
+    audit_categories['host'] = HostConfAudit(url=daemon)
+    audit_categories['container_imgs'] = ContainerImgAudit(url=daemon)
+    audit_categories['container_runtime'] = ContainerRuntimeAudit(url=daemon)
   else:
     audit_categories['host'] = HostConfAudit()
     audit_categories['container_imgs'] = ContainerImgAudit()
