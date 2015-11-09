@@ -107,7 +107,7 @@ class FormattedOutput:
                  'container_runtime': '5.Container Runtime',
                  }
 
-    print '''drydock v0.2 Audit Results\n==========================\n'''
+    print '''drydock v0.3 Audit Results\n==========================\n'''
     #Print results
     for cat, catdescr in auditcats.iteritems():
       cat_inst = self.audit_categories[cat]
