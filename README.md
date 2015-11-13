@@ -22,13 +22,21 @@ Assuming that your Docker daemon uses unix sockets (default configuration), the 
 * -p <path to profile> : The profile which will be used for the audit. Switches to conf/default.yaml if none specified.
 * -v <verbosity> : Use values 1, 2 or 3 to change verbosity level to ERROR, WARNING or DEBUG accordingly. Default is 1
 
+Example:
+```
+python drydock.py -o output.json -p conf/myprofile.yml -v 2
+```
 ### Remote Docker host
 If your Docker daemon listens on an exposed port, using TLS, you must provide the following :
 
-* -d <IP:port> Docker daemon IP and listening port
-* -c <path> Client certificate
-* -k <path> Client certificate key
+* -d <*IP:port*> Docker daemon IP and listening port
+* -c <*path*> Client certificate
+* -k <*path*> Client certificate key
 
+Example:
+```
+python drydock.py -d 10.0.0.2:2736 -c /home/user/cert/cert.pem -k /home/user/cert/cert.key -o output.json -p conf/myprofile.yml
+```
 ## TODO
 - Web Interface - Frontend in Flask(or Bottle) and Jinja2 for profile creation, importing results etc.
 - Database support - Keeping track of results, provide analytics etc.
