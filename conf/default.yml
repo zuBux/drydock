@@ -4,7 +4,7 @@ host:
       version :  "3.13"
   - check_listening_srv             #1.5 Remove all non-essential services from the host
   - check_docker_ver:               #1.6 Keep Docker up to date
-      version : "1.9.0"
+      version : "1.10.0"
   - list_trusted_users              #1.7 Only allow trusted users to control Docker daemon
   - check_auditd_rules:             #1.8 - 1.19 Audit docker daemon, files and directories
       paths: ["/usr/bin/docker",
