@@ -5,6 +5,7 @@ import logging
 from collections import OrderedDict
 from datetime import datetime
 from colorama import init, Fore, Back, Style
+from junit_xml import TestSuite, TestCase
 
 from audits.host import HostConfAudit
 from audits.dock import DockerConfAudit, DockerFileAudit
@@ -30,7 +31,7 @@ class FormattedOutput:
     info['score'] = "%s/%s" %(passed,total)
     self.log['info'] = info
     return
-    
+
   def save_results(self,name,res):
     self.log[name] = res
     return
@@ -45,10 +46,33 @@ class FormattedOutput:
      # print json_data
       f.write(json_data)
     return
-  
+
+  def write_xml_file(self):
+    test_cases = []
+    if os.path.isfile(self.output):
+      logging.warn("File exists,deleting...")
+      os.remove(self.output)
+    with open(self.output,'a') as f:
+      for patient, mutations in self.log.items():
+        for j in mutations.viewitems():
+          if j[0] == 'date' or j[0] == 'profile' or j[0] == 'score':
+            pass
+          else:
+            try:
+              test_case = TestCase(j[0], j[1]['descr'], '', '', '')
+              if j[1]['status'] == 'Fail':
+                test_case.add_failure_info(j[1]['output'])
+              else:
+                test_case = TestCase(j[0], '', '', '', '')
+              test_cases.append(test_case)
+            except KeyError:
+              pass
+      ts = [TestSuite("Docker Security Benchmarks", test_cases)]
+      TestSuite.to_file(f, ts)
+
   def get_score(self):
     """
-    Calculates benchmark score by taking account 
+    Calculates benchmark score by taking account
     results containing 'status' key
     """
     allchecks = 0
