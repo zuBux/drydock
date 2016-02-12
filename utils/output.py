@@ -20,8 +20,6 @@ class FormattedOutput:
     for key in kwargs:
       self.audit_categories[key] = kwargs[key]
 
-    #init()
-
   def audit_init_info(self,profile):
     info = {}
     (passed, total) = self.get_score()
@@ -30,11 +28,9 @@ class FormattedOutput:
     info['profile'] = profile
     info['score'] = "%s/%s" %(passed,total)
     self.log['info'] = info
-    return
 
   def save_results(self,name,res):
     self.log[name] = res
-    return
 
   def write_file(self):
     if os.path.isfile(self.output):
@@ -45,7 +41,6 @@ class FormattedOutput:
                  indent=4, separators=(',', ': '))
      # print json_data
       f.write(json_data)
-    return
 
   def write_xml_file(self):
     test_cases = []
@@ -53,9 +48,10 @@ class FormattedOutput:
       logging.warn("File exists,deleting...")
       os.remove(self.output)
     with open(self.output,'a') as f:
-      for patient, mutations in self.log.items():
-        for j in mutations.viewitems():
+      for _, elements in self.log.items():
+        for j in elements.viewitems():
           if j[0] == 'date' or j[0] == 'profile' or j[0] == 'score':
+            # we really don't care
             pass
           else:
             try:
@@ -66,6 +62,7 @@ class FormattedOutput:
                 test_case = TestCase(j[0], '', '', '', '')
               test_cases.append(test_case)
             except KeyError:
+              # the world's smallest violin playin' for KeyError
               pass
       ts = [TestSuite("Docker Security Benchmarks", test_cases)]
       TestSuite.to_file(f, ts)
@@ -109,7 +106,6 @@ class FormattedOutput:
     except KeyError:
       pass
     print "\n"
-    return None
 
   def create_ordereddict(self,dct,auditcat):
     """Creates a sorted dict of audits from an unsorted one"""
@@ -132,7 +128,7 @@ class FormattedOutput:
                  }
 
     print '''drydock v0.3 Audit Results\n==========================\n'''
-    #Print results
+    # Print results
     for cat, catdescr in auditcats.iteritems():
       cat_inst = self.audit_categories[cat]
       try:
@@ -143,13 +139,13 @@ class FormattedOutput:
           for audit in audits.keys():
             results = output[cat][audit]
             descr = getattr(cat_inst,audit).__doc__
-            print( descr + '\n' + '-'*len(descr) ) 
+            print( descr + '\n' + '-'*len(descr) )
             self.print_results(results)
       except KeyError:
         logging.warn("No audit category %s" %auditcats[cat])
         continue
-          
-    #Print Overview info for the audit
+
+    # Print Overview info for the audit
     print(Style.BRIGHT + "Overview\n--------" +Style.RESET_ALL)
     print('Profile: ' + output['info']['profile'])
     print('Date: ' + output['info']['date'])
