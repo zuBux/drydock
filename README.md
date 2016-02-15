@@ -24,7 +24,7 @@ Assuming that your Docker daemon uses unix sockets (default configuration), the 
 * -f <format> : Output format. Supports JSON (-f json) and JUnit XML (-f xml). Default is JSON
 Example:
 ```
-python drydock.py -o output.json -p conf/myprofile.yml -v 2
+python drydock.py -o audit_aws -f xml -p conf/myprofile.yml -v 2
 ```
 ### Remote Docker host
 If your Docker daemon listens on an exposed port, using TLS, you must provide the following :
@@ -35,7 +35,7 @@ If your Docker daemon listens on an exposed port, using TLS, you must provide th
 
 Example:
 ```
-python drydock.py -d 10.0.0.2:2736 -c /home/user/cert/cert.pem -k /home/user/cert/cert.key -o output.json -p conf/myprofile.yml
+python drydock.py -d 10.0.0.2:2736 -c /home/user/cert/cert.pem -k /home/user/cert/cert.key -o audit_remote -p conf/myprofile.yml
 ```
 ## TODO
 - Web Interface - Frontend in Flask(or Bottle) and Jinja2 for profile creation, importing results etc.
