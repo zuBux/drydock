@@ -21,7 +21,7 @@ Assuming that your Docker daemon uses unix sockets (default configuration), the 
 * -o <file_name> : Specifies the path where JSON output will be saved. Switches to output.json if none specified.
 * -p <path to profile> : The profile which will be used for the audit. Switches to conf/default.yaml if none specified.
 * -v <verbosity> : Use values 1, 2 or 3 to change verbosity level to ERROR, WARNING or DEBUG accordingly. Default is 1
-
+* -f <format> : Output format. Supports JSON (-f json) and JUnit XML (-f xml). Default is JSON
 Example:
 ```
 python drydock.py -o output.json -p conf/myprofile.yml -v 2
