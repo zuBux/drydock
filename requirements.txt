@@ -8,3 +8,4 @@ requests==2.8.1
 six==1.10.0
 websocket-client==0.34.0
 wsgiref==0.1.2
+junit-xml==1.6
