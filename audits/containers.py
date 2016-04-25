@@ -21,7 +21,7 @@ class ContainerImgAudit(Audit):
       self.cli = Client(base_url = url)
     self.running = self.running_containers()
 
-  @assign_order(1)     
+  @assign_order(1)
   def container_user(self):
     """4.1 Create a user for the container"""
     nouser = []
@@ -78,7 +78,7 @@ class ContainerRuntimeAudit(Audit):
       self.templog['status'] = 'Pass'
       self.templog['descr'] = "All containers have AppArmor profiles"
     return self.templog
-    
+
   @assign_order(2)
   def verify_selinux(self):
     """5.2 Verify SELinux security options"""
@@ -135,11 +135,8 @@ class ContainerRuntimeAudit(Audit):
         info = self.cli.inspect_container(container)
         caps = defaultdict(list)
         capadd = info['HostConfig']['CapAdd']
-        capdrop = info['HostConfig']['CapDrop']
         if capadd:
           caps['CapAdd'] = capadd
-        if capdrop:
-          caps['CapDrop'] = capdrop
         if caps:
           container_caps[container] = caps
     except TypeError:
@@ -147,7 +144,7 @@ class ContainerRuntimeAudit(Audit):
 
     if len(container_caps):
       self.templog['status'] = 'Fail'
-      self.templog['descr'] = "Kernel capabilities found"\
+      self.templog['descr'] = "%d added kernel capabilities found"\
                               %len(container_caps)
       self.templog['output'] = container_caps
     else:
@@ -235,7 +232,7 @@ class ContainerRuntimeAudit(Audit):
     """5.8 Do not map privileged ports within containers"""
     exclude = defaultdict(list)
     bad_mappings = defaultdict(list)
-    
+
     if ignore_ports != None:
       for k,v in ignore_ports.iteritems():
         exclude[k].append(v)
