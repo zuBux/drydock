@@ -1,4 +1,7 @@
 #What is drydock?
+
+NOTICE: Development is temporarily slowed down due to involvement with Docker's [Actuary](https://github.com/diogomonica/actuary). Feel free to make PRs, I will review ASAP, and be patient for updates :)
+
 **drydock** is a Docker security audit tool written in Python. It was initially inspired by [docker-bench-security](https://github.com/docker/docker-bench-security) but aims to provide a more flexible way for assesing Docker installations and deployments. drydock allows easy creation and use of **custom audit profiles** in order to eliminate noise and false alarms. Reports are saved in JSON format for easier parsing. drydock makes heavy use of [docker-py](https://github.com/docker/docker-py) client API to communicate with Docker.
 
 At the moment all of the security checks performed are based on the [CIS Docker 1.6 Benchmark](https://benchmarks.cisecurity.org/tools2/docker/CIS_Docker_1.6_Benchmark_v1.0.0.pdf). 
@@ -38,8 +41,7 @@ Example:
 python drydock.py -d 10.0.0.2:2736 -c /home/user/cert/cert.pem -k /home/user/cert/cert.key -o audit_remote -p conf/myprofile.yml
 ```
 ## TODO
-- Web Interface - Frontend in Flask(or Bottle) and Jinja2 for profile creation, importing results etc.
-- Database support - Keeping track of results, provide analytics etc.
+- Migrate checks to CIS Docker 1.11 Benchmark
 
 ## Contributions
 drydock is in beta stage and **needs testing under different environments** (currently tested only on Ubuntu/Debian deployments). All contributions ( bugs/improvements/suggestions etc. ) are welcome!
